@@ -18,20 +18,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.context.TestPropertySource;
 
 @WebMvcTest(AuthenticationController.class)
 @AutoConfigureMockMvc
 @Import({ SecurityConfig.class, JwtAuthenticationFilter.class, JwtService.class })
-@TestPropertySource(properties = {
-                "security.jwt.secret=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-                "security.jwt.expiration-seconds=3600"
-})
+@ActiveProfiles("test")
 class AuthenticationControllerTest {
 
         @Autowired
