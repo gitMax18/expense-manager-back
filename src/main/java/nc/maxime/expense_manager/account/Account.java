@@ -1,5 +1,9 @@
 package nc.maxime.expense_manager.account;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,14 +11,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nc.maxime.expense_manager.common.model.BaseEntity;
+import nc.maxime.expense_manager.transaction.Transaction;
 import nc.maxime.expense_manager.user.User;
 
 @Getter
@@ -46,6 +51,10 @@ public class Account extends BaseEntity {
     @Column(name = "is_archived", nullable = false)
     @Builder.Default
     private boolean archived = false;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
