@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import nc.maxime.expense_manager.account.dto.AccountResponse;
 import nc.maxime.expense_manager.account.dto.CreateAccountDto;
+import nc.maxime.expense_manager.common.response.AppResponse;
 import nc.maxime.expense_manager.user.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,11 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<AccountResponse> createAccount(
+    public ResponseEntity<AppResponse<AccountResponse>> createAccount(
             @NotNull @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateAccountDto request) {
+        var account = accountService.createAccount(user, request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(accountService.createAccount(user, request));
+                .body(new AppResponse<AccountResponse>("New account created", account));
     }
 }
