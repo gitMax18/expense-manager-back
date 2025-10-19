@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import nc.maxime.expense_manager.auth.dto.AuthenticationResponse;
 import nc.maxime.expense_manager.auth.dto.AuthenticationRequest;
 import org.springframework.http.ResponseEntity;
+import nc.maxime.expense_manager.common.response.AppResponse;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,12 +23,16 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+    public ResponseEntity<AppResponse<AuthenticationResponse>> login(
+            @Valid @RequestBody AuthenticationRequest request) {
+        var response = authenticationService.authenticate(request);
+        return ResponseEntity.ok(new AppResponse<AuthenticationResponse>("Authentification successful", response));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.register(request));
+    public ResponseEntity<AppResponse<AuthenticationResponse>> register(
+            @Valid @RequestBody AuthenticationRequest request) {
+        var response = authenticationService.register(request);
+        return ResponseEntity.ok(new AppResponse<AuthenticationResponse>("Registration successful", response));
     }
 }
