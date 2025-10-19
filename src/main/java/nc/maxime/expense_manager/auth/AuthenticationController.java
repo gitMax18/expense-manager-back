@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import nc.maxime.expense_manager.auth.dto.AuthenticationResponse;
 import nc.maxime.expense_manager.auth.dto.AuthenticationRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Validated
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
