@@ -26,13 +26,13 @@ public class AuthenticationController {
     public ResponseEntity<AppResponse<AuthenticationResponse>> login(
             @Valid @RequestBody AuthenticationRequest request) {
         var response = authenticationService.authenticate(request);
-        return ResponseEntity.ok(new AppResponse<AuthenticationResponse>("Authentification successful", response));
+        return ResponseEntity.ok(AppResponse.message("Authentification successful").data(response));
     }
 
     @PostMapping("/register")
     public ResponseEntity<AppResponse<AuthenticationResponse>> register(
             @Valid @RequestBody AuthenticationRequest request) {
         var response = authenticationService.register(request);
-        return ResponseEntity.ok(new AppResponse<AuthenticationResponse>("Registration successful", response));
+        return ResponseEntity.ok(AppResponse.message("Registration successful").data(response));
     }
 }
