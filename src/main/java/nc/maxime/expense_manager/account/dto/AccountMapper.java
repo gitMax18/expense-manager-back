@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccountMapper {
 
-    public Account toEntity(User user, CreateAccountDto request) {
+    public Account toEntity(User user, UpsertAccountDto request) {
         var owner = Optional.ofNullable(user)
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur requis pour créer un compte"));
         return Account.builder()
@@ -32,5 +32,21 @@ public class AccountMapper {
                 account.isArchived(),
                 account.getCreatedAt(),
                 account.getUpdatedAt());
+    }
+
+    public Account updateEntity(Account account, UpsertAccountDto request) {
+        var payload = Optional.ofNullable(request)
+                .orElseThrow(() -> new IllegalArgumentException("Requête de mise à jour d'un compte invalide"));
+
+        return Optional.ofNullable(account)
+                .map(existing -> {
+                    existing.setName(payload.name());
+                    existing.setDescription(payload.description());
+                    existing.setBalance(payload.balance());
+                    existing.setType(payload.type());
+                    existing.setCurrency(payload.currency());
+                    return existing;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Compte cible de la mise à jour invalide"));
     }
 }
