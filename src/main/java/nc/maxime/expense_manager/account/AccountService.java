@@ -36,6 +36,12 @@ public class AccountService {
         return accountRepository.findByUser(owner).stream().map(accountMapper::toResponse).toList();
     }
 
+    public AccountResponse getAccount(Long accountId) {
+        return accountRepository.findById(accountId)
+                .map(accountMapper::toResponse)
+                .orElseThrow(() -> new IllegalArgumentException("Compte introuvable"));
+    }
+
     public AccountResponse updateAccount(Long accountId, UpsertAccountDto request) {
         return Optional.ofNullable(accountId)
                 .flatMap(accountRepository::findById)

@@ -46,6 +46,12 @@ public class AccountController {
         return ResponseEntity.ok().body(AppResponse.message("User accounts send").data(accounts));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AppResponse<AccountResponse>> getAccountById(@PathVariable Long id) {
+        AccountResponse account = accountService.getAccount(id);
+        return ResponseEntity.ok().body(AppResponse.message("Account find").data(account));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<AppResponse<AccountResponse>> updateAccount(
             @NotNull @AuthenticationPrincipal User user,
