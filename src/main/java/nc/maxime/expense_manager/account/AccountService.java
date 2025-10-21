@@ -21,13 +21,13 @@ public class AccountService {
 
     public AccountResponse createAccount(User user, UpsertAccountDto request) {
         User owner = Optional.ofNullable(user)
-                .orElseThrow(() -> new IllegalArgumentException("Utilisateur propriétaire du compte invalide"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid account owner"));
 
         return Optional.ofNullable(request)
                 .map(dto -> accountMapper.toEntity(owner, dto))
                 .map(accountRepository::save)
                 .map(accountMapper::toResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Requête de création d'un compte invalide"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid account creation request"));
     }
 
     public List<AccountResponse> getUserAccounts(User user) {
@@ -39,7 +39,7 @@ public class AccountService {
     public AccountResponse getAccount(Long accountId) {
         return accountRepository.findById(accountId)
                 .map(accountMapper::toResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Compte introuvable"));
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
     }
 
     public AccountResponse updateAccount(Long accountId, UpsertAccountDto request) {
@@ -48,6 +48,16 @@ public class AccountService {
                 .map(account -> accountMapper.updateEntity(account, request))
                 .map(accountRepository::save)
                 .map(accountMapper::toResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Compte introuvable pour cet utilisateur"));
+                .orElseThrow(() -> new IllegalArgumentException("Account not found for this user"));
+    }
+
+    public void deleteAccount(Long accountId) {
+        Optional.ofNullable(accountId)
+                .flatMap(accountRepository::findById)
+                .ifPresentOrElse(
+                        accountRepository::delete,
+                        () -> {
+                            throw new IllegalArgumentException("Account not found for this user");
+                        });
     }
 }
