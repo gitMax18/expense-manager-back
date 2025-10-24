@@ -7,9 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import nc.maxime.expense_manager.auth.dto.AuthenticationRequest;
-import nc.maxime.expense_manager.auth.dto.AuthenticationResponse;
-import nc.maxime.expense_manager.security.jwt.JwtService;
+import nc.maxime.expense_manager.auth.dto.AuthenticationRequestDto;
 import nc.maxime.expense_manager.user.Role;
 import nc.maxime.expense_manager.user.User;
 import nc.maxime.expense_manager.user.UserRepository;
@@ -32,9 +30,6 @@ class AuthenticationServiceTest {
         private AuthenticationManager authenticationManager;
 
         @Mock
-        private JwtService jwtService;
-
-        @Mock
         private UserRepository userRepository;
 
         @Mock
@@ -51,30 +46,26 @@ class AuthenticationServiceTest {
 
         @Test
         void authenticateShouldReturnResponseWhenUserExists() {
-                var request = new AuthenticationRequest("john.doe@example.com", "secret");
+                var request = new AuthenticationRequestDto("john.doe@example.com", "secret");
                 var existingUser = User.builder()
                                 .email(request.email())
                                 .password("hashed-password")
                                 .role(Role.USER)
                                 .build();
                 when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(existingUser));
-                when(jwtService.generateToken(existingUser)).thenReturn("jwt-token");
-
-                AuthenticationResponse response = authenticationService.authenticate(request);
+                var result = authenticationService.authenticate(request);
 
                 verify(authenticationManager).authenticate(authenticationTokenCaptor.capture());
                 var capturedToken = authenticationTokenCaptor.getValue();
                 assertEquals(request.email(), capturedToken.getPrincipal());
                 assertEquals(request.password(), capturedToken.getCredentials());
 
-                assertEquals(existingUser.getEmail(), response.email());
-                assertEquals(existingUser.getRole(), response.role());
-                assertEquals("jwt-token", response.token());
+                assertEquals(existingUser, result);
         }
 
         @Test
         void authenticateShouldThrowWhenUserNotFound() {
-                var request = new AuthenticationRequest("unknown@example.com", "secret");
+                var request = new AuthenticationRequestDto("unknown@example.com", "secret");
                 when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
 
                 assertThrows(UsernameNotFoundException.class, () -> authenticationService.authenticate(request));
@@ -82,12 +73,10 @@ class AuthenticationServiceTest {
 
         @Test
         void registerShouldPersistUserAndReturnResponse() {
-                var request = new AuthenticationRequest("new.user@example.com", "secret");
+                var request = new AuthenticationRequestDto("new.user@example.com", "secret");
                 when(passwordEncoder.encode(request.password())).thenReturn("encoded-secret");
                 when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-                when(jwtService.generateToken(any(User.class))).thenReturn("jwt-token");
-
-                AuthenticationResponse response = authenticationService.register(request);
+                var result = authenticationService.register(request);
 
                 verify(userRepository).save(userCaptor.capture());
                 var savedUser = userCaptor.getValue();
@@ -95,10 +84,6 @@ class AuthenticationServiceTest {
                 assertEquals("encoded-secret", savedUser.getPassword());
                 assertEquals(Role.USER, savedUser.getRole());
 
-                assertEquals(savedUser.getEmail(), response.email());
-                assertEquals(savedUser.getRole(), response.role());
-                assertEquals("jwt-token", response.token());
-
-                verify(jwtService).generateToken(savedUser);
+                assertEquals(savedUser, result);
         }
 }

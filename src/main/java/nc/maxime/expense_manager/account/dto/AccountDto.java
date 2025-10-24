@@ -2,10 +2,9 @@ package nc.maxime.expense_manager.account.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-
 import nc.maxime.expense_manager.account.AccountType;
 
-public record AccountResponse(
+public record AccountDto(
         Long id,
         String name,
         String description,
