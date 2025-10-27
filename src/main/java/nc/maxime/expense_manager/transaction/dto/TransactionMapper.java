@@ -2,8 +2,8 @@ package nc.maxime.expense_manager.transaction.dto;
 
 import java.util.Optional;
 import nc.maxime.expense_manager.account.Account;
+import nc.maxime.expense_manager.category.TransactionCategory;
 import nc.maxime.expense_manager.transaction.Transaction;
-import nc.maxime.expense_manager.transaction.TransactionCategory;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -2,12 +2,15 @@ package nc.maxime.expense_manager.transaction;
 
 import java.util.List;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import nc.maxime.expense_manager.common.response.AppResponse;
 import nc.maxime.expense_manager.transaction.dto.TransactionDto;
 import nc.maxime.expense_manager.transaction.dto.TransactionMapper;
 import nc.maxime.expense_manager.transaction.dto.UpsertTransactionDto;
+import nc.maxime.expense_manager.user.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +46,9 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<AppResponse<List<TransactionDto>>> getTransactions(
+            @NotNull @AuthenticationPrincipal User user,
             @RequestParam(value = "accountId", required = false) Long accountId) {
-        var transactions = transactionService.getTransactions(accountId).stream()
+        var transactions = transactionService.getTransactions(user, accountId).stream()
                 .map(transactionMapper::toDto)
                 .toList();
         return ResponseEntity.ok(AppResponse.message("Transactions retrieved").data(transactions));

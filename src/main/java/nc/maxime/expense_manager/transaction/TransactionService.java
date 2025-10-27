@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import nc.maxime.expense_manager.account.Account;
 import nc.maxime.expense_manager.account.AccountRepository;
+import nc.maxime.expense_manager.category.TransactionCategory;
+import nc.maxime.expense_manager.category.TransactionCategoryRepository;
 import nc.maxime.expense_manager.transaction.dto.TransactionMapper;
 import nc.maxime.expense_manager.transaction.dto.UpsertTransactionDto;
+import nc.maxime.expense_manager.user.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,10 +41,14 @@ public class TransactionService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction creation request"));
     }
 
-    public List<Transaction> getTransactions(Long accountId) {
+    public List<Transaction> getTransactions(User user, Long accountId) {
+        var owner = Optional.ofNullable(user)
+                .orElseThrow(() -> new IllegalArgumentException("User required to retrieve transactions"));
+
         return Optional.ofNullable(accountId)
-                .map(transactionRepository::findByAccountId)
-                .orElseGet(transactionRepository::findAll);
+                .map(id -> resolveAccount(owner, id))
+                .map(transactionRepository::findByAccount)
+                .orElseGet(() -> transactionRepository.findByAccountUser(owner));
     }
 
     public Transaction getTransaction(Long transactionId) {
@@ -77,6 +84,20 @@ public class TransactionService {
     private Account resolveAccount(Long accountId) {
         return Optional.ofNullable(accountId)
                 .flatMap(accountRepository::findById)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found for transaction"));
+    }
+
+    private Account resolveAccount(User owner, Long accountId) {
+        Long ownerId = Optional.ofNullable(owner)
+                .map(User::getId)
+                .orElseThrow(() -> new IllegalArgumentException("User required to resolve account"));
+
+        return Optional.ofNullable(accountId)
+                .flatMap(accountRepository::findById)
+                .filter(account -> Optional.ofNullable(account.getUser())
+                        .map(User::getId)
+                        .filter(ownerId::equals)
+                        .isPresent())
                 .orElseThrow(() -> new IllegalArgumentException("Account not found for transaction"));
     }
 

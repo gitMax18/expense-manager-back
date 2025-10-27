@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nc.maxime.expense_manager.account.Account;
+import nc.maxime.expense_manager.category.TransactionCategory;
 import nc.maxime.expense_manager.common.model.BaseEntity;
 
 @Getter
