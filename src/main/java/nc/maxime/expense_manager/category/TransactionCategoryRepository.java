@@ -1,4 +1,4 @@
-package nc.maxime.expense_manager.transaction;
+package nc.maxime.expense_manager.category;
 
 import java.util.List;
 import nc.maxime.expense_manager.user.User;
