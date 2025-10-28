@@ -1,5 +1,6 @@
 package nc.maxime.expense_manager.transaction;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import nc.maxime.expense_manager.account.Account;
@@ -10,6 +11,7 @@ import nc.maxime.expense_manager.transaction.dto.TransactionMapper;
 import nc.maxime.expense_manager.transaction.dto.UpsertTransactionDto;
 import nc.maxime.expense_manager.user.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TransactionService {
@@ -30,12 +32,17 @@ public class TransactionService {
         this.transactionMapper = transactionMapper;
     }
 
+    @Transactional
     public Transaction createTransaction(UpsertTransactionDto request) {
         return Optional.ofNullable(request)
                 .map(dto -> {
                     Account account = resolveAccount(dto.accountId());
                     TransactionCategory category = resolveCategory(dto.categoryId());
-                    return transactionMapper.toEntity(account, category, dto);
+                    Transaction transaction = transactionMapper.toEntity(account, category, dto);
+                    Account updatedAccount = applyBalanceDelta(
+                            account, calculateBalanceDelta(transaction.getType(), transaction.getAmount()));
+                    transaction.setAccount(updatedAccount);
+                    return transaction;
                 })
                 .map(transactionRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction creation request"));
@@ -57,6 +64,7 @@ public class TransactionService {
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 
+    @Transactional
     public Transaction updateTransaction(Long transactionId, UpsertTransactionDto request) {
         return Optional.ofNullable(transactionId)
                 .flatMap(transactionRepository::findById)
@@ -65,20 +73,56 @@ public class TransactionService {
                             .orElseThrow(() -> new IllegalArgumentException("Invalid transaction update payload"));
                     Account account = resolveAccount(payload.accountId());
                     TransactionCategory category = resolveCategory(payload.categoryId());
-                    return transactionMapper.updateEntity(existing, account, category, payload);
+                    BigDecimal previousDelta =
+                            calculateBalanceDelta(existing.getType(), existing.getAmount());
+                    applyBalanceDelta(existing.getAccount(), previousDelta.negate());
+
+                    Transaction updated =
+                            transactionMapper.updateEntity(existing, account, category, payload);
+                    Account updatedAccount = applyBalanceDelta(
+                            updated.getAccount(),
+                            calculateBalanceDelta(updated.getType(), updated.getAmount()));
+                    updated.setAccount(updatedAccount);
+
+                    return updated;
                 })
                 .map(transactionRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 
-    public void deleteTransaction(Long transactionId) {
-        Optional.ofNullable(transactionId)
+    @Transactional
+    public Account deleteTransaction(Long transactionId) {
+        return Optional.ofNullable(transactionId)
                 .flatMap(transactionRepository::findById)
-                .ifPresentOrElse(
-                        transactionRepository::delete,
-                        () -> {
-                            throw new IllegalArgumentException("Transaction not found");
-                        });
+                .map(transaction -> {
+                    Account account = applyBalanceDelta(
+                            transaction.getAccount(),
+                            calculateBalanceDelta(transaction.getType(), transaction.getAmount()).negate());
+                    transactionRepository.delete(transaction);
+                    return account;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    }
+
+    private Account applyBalanceDelta(Account account, BigDecimal delta) {
+        if (account == null || delta == null || delta.compareTo(BigDecimal.ZERO) == 0) {
+            return account;
+        }
+
+        BigDecimal currentBalance = Optional.ofNullable(account.getBalance()).orElse(BigDecimal.ZERO);
+        account.setBalance(currentBalance.add(delta));
+        return accountRepository.save(account);
+    }
+
+    private BigDecimal calculateBalanceDelta(TransactionType type, BigDecimal amount) {
+        if (type == null || amount == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return switch (type) {
+            case INCOME, TRANSFER_IN -> amount;
+            case EXPENSE, TRANSFER_OUT -> amount.negate();
+        };
     }
 
     private Account resolveAccount(Long accountId) {

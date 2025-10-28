@@ -2,12 +2,19 @@ package nc.maxime.expense_manager.transaction.dto;
 
 import java.util.Optional;
 import nc.maxime.expense_manager.account.Account;
+import nc.maxime.expense_manager.account.dto.AccountMapper;
 import nc.maxime.expense_manager.category.TransactionCategory;
 import nc.maxime.expense_manager.transaction.Transaction;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TransactionMapper {
+
+    private final AccountMapper accountMapper;
+
+    public TransactionMapper(AccountMapper accountMapper) {
+        this.accountMapper = accountMapper;
+    }
 
     public Transaction toEntity(Account account, TransactionCategory category, UpsertTransactionDto request) {
         return Optional.ofNullable(request)
@@ -24,10 +31,7 @@ public class TransactionMapper {
     }
 
     public Transaction updateEntity(
-            Transaction transaction,
-            Account account,
-            TransactionCategory category,
-            UpsertTransactionDto request) {
+            Transaction transaction, Account account, TransactionCategory category, UpsertTransactionDto request) {
         var payload = Optional.ofNullable(request)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction update payload"));
 
@@ -54,7 +58,7 @@ public class TransactionMapper {
                 transaction.getNotes(),
                 transaction.getMerchant(),
                 Optional.ofNullable(transaction.getAccount())
-                        .map(Account::getId)
+                        .map(accountMapper::toDto)
                         .orElse(null),
                 Optional.ofNullable(transaction.getCategory())
                         .map(TransactionCategory::getId)

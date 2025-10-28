@@ -3,6 +3,8 @@ package nc.maxime.expense_manager.transaction;
 import java.util.List;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import nc.maxime.expense_manager.account.dto.AccountDto;
+import nc.maxime.expense_manager.account.dto.AccountMapper;
 import nc.maxime.expense_manager.common.response.AppResponse;
 import nc.maxime.expense_manager.transaction.dto.TransactionDto;
 import nc.maxime.expense_manager.transaction.dto.TransactionMapper;
@@ -29,10 +31,13 @@ public class TransactionController {
 
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
+    private final AccountMapper accountMapper;
 
-    public TransactionController(TransactionService transactionService, TransactionMapper transactionMapper) {
+    public TransactionController(
+            TransactionService transactionService, TransactionMapper transactionMapper, AccountMapper accountMapper) {
         this.transactionService = transactionService;
         this.transactionMapper = transactionMapper;
+        this.accountMapper = accountMapper;
     }
 
     @PostMapping
@@ -71,8 +76,9 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<AppResponse<Void>> deleteTransaction(@PathVariable Long id) {
-        transactionService.deleteTransaction(id);
-        return ResponseEntity.ok(AppResponse.message("Transaction deleted").data(null));
+    public ResponseEntity<AppResponse<AccountDto>> deleteTransaction(@PathVariable Long id) {
+        var account = transactionService.deleteTransaction(id);
+        var response = accountMapper.toDto(account);
+        return ResponseEntity.ok(AppResponse.message("Transaction deleted").data(response));
     }
 }

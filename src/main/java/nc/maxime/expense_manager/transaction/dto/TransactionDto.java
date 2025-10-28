@@ -2,6 +2,7 @@ package nc.maxime.expense_manager.transaction.dto;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import nc.maxime.expense_manager.account.dto.AccountDto;
 import nc.maxime.expense_manager.transaction.TransactionType;
 
 public record TransactionDto(
@@ -11,7 +12,7 @@ public record TransactionDto(
         String label,
         String notes,
         String merchant,
-        Long accountId,
+        AccountDto account,
         Long categoryId,
         Instant createdAt,
         Instant updatedAt) {
