@@ -20,6 +20,8 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+      - name: start db container
+        run: docker-compose -f ./docker/docker-compose.yaml up
       - name: Build
         run: mvn verify
 
