@@ -9,6 +9,7 @@ on:
 
 jobs:
   verify:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -23,7 +24,6 @@ jobs:
         run: mvn verify
 
   push-image:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     needs: verify
     runs-on: ubuntu-24.04
     steps:
