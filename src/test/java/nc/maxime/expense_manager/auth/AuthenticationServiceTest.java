@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import nc.maxime.expense_manager.auth.dto.AuthenticationRequestDto;
+import nc.maxime.expense_manager.category.TransactionCategoryService;
 import nc.maxime.expense_manager.user.Role;
 import nc.maxime.expense_manager.user.User;
 import nc.maxime.expense_manager.user.UserRepository;
@@ -34,6 +35,9 @@ class AuthenticationServiceTest {
 
         @Mock
         private PasswordEncoder passwordEncoder;
+
+        @Mock
+        private TransactionCategoryService transactionCategoryService;
 
         @InjectMocks
         private AuthenticationService authenticationService;
@@ -83,6 +87,7 @@ class AuthenticationServiceTest {
                 assertEquals(request.email(), savedUser.getEmail());
                 assertEquals("encoded-secret", savedUser.getPassword());
                 assertEquals(Role.USER, savedUser.getRole());
+                verify(transactionCategoryService).createDefaultCategories(savedUser);
 
                 assertEquals(savedUser, result);
         }
