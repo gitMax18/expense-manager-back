@@ -1,10 +1,10 @@
-name: Create staging image
+name: Create production image
 
 on:
   push:
-    branches: ["staging"]
+    branches: ["prod"]
   pull_request:
-    branches: ["staging"]
+    branches: ["prod"]
     types: [closed]
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-      - name: start verify
+      - name: Start verify
         run: mvn verify
 
   push-image:
@@ -50,4 +50,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}-staging:latest
+          tags: ghcr.io/${{ github.repository }}-prod:latest
