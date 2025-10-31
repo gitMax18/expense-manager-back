@@ -11,6 +11,15 @@ jobs:
   test:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: expense_manager
+        ports:
+          - "5432:5432"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
