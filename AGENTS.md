@@ -37,7 +37,14 @@ Cette application sert a gérer ces dépenses en enregistrant les entrés et sor
 ## Test
 
 - Les tests utiliseront Junit et mockito
-- Les tests concernant la base de données devront etres fait avec test container.
+- Les tests concernant la base de données devront etres fait avec test container
+- Les tests concernant des formulaires devront également vérifier que les erreurs sont bien gérer avec renvoi de key value
+
+## CI/CD
+
+- 3 branches sont gérées par la CI/CD, dev (execute les tests), staging (test et création d'une image pour déploiment en stagging), prod (test et création d'une image pour déploiment en production)
+
+- Utilisation de github actions
 
 # Exécution
 
