@@ -12,6 +12,7 @@ public record TransactionDto(
         String label,
         String notes,
         String merchant,
+        boolean isRecurringTransaction,
         AccountDto account,
         Long categoryId,
         Instant createdAt,

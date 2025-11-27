@@ -43,6 +43,10 @@ public class Transaction extends BaseEntity {
     @Column
     private String merchant;
 
+    @Column(name = "is_recurring_transaction", nullable = false)
+    @Builder.Default
+    private boolean isRecurringTransaction = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;

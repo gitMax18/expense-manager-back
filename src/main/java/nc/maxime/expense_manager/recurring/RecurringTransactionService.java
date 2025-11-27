@@ -183,7 +183,8 @@ public class RecurringTransactionService {
                 recurringTransaction.getNotes(),
                 recurringTransaction.getMerchant(),
                 accountId,
-                categoryId);
+                categoryId,
+                true);
 
         transactionService.createTransaction(transactionDto);
     }
