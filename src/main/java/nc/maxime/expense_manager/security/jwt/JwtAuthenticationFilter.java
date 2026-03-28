@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -32,9 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
-        var authHeader = request.getHeader("Authorization");
+            FilterChain filterChain) throws ServletException, IOException {
+        var authHeader = request.getHeader(AUTHORIZATION_HEADER_KEY);
         if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
@@ -63,8 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var authentication = new UsernamePasswordAuthenticationToken(
                 user,
                 null,
-                user.getAuthorities()
-        );
+                user.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
