@@ -1,0 +1,4 @@
+ALTER TABLE
+    transaction_category
+ADD
+    COLUMN IF NOT EXISTS color VARCHAR(9) DEFAULT '#6B7280';
