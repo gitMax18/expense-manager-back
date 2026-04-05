@@ -11,16 +11,16 @@ import org.springframework.stereotype.Service;
 public class TransactionCategoryService {
 
     private static final List<DefaultCategory> DEFAULT_CATEGORIES = List.of(
-            new DefaultCategory("Groceries", "Food and household supplies"),
-            new DefaultCategory("Rent", "Monthly rent or mortgage payments"),
-            new DefaultCategory("Utilities", "Electricity, water, internet, and other utilities"),
-            new DefaultCategory("Transportation", "Fuel, public transport, ride sharing"),
-            new DefaultCategory("Dining Out", "Restaurants, cafes, and takeout"),
-            new DefaultCategory("Entertainment", "Streaming, movies, events, and hobbies"),
-            new DefaultCategory("Healthcare", "Medical visits, pharmacy, and insurance co-pays"),
-            new DefaultCategory("Insurance", "Home, auto, life, and other insurance premiums"),
-            new DefaultCategory("Savings", "Emergency fund and long-term savings"),
-            new DefaultCategory("Salary", "Primary income and payroll deposits"));
+            new DefaultCategory("Groceries", "Food and household supplies", "#22C55E"),
+            new DefaultCategory("Rent", "Monthly rent or mortgage payments", "#EA580C"),
+            new DefaultCategory("Utilities", "Electricity, water, internet, and other utilities", "#0EA5E9"),
+            new DefaultCategory("Transportation", "Fuel, public transport, ride sharing", "#6366F1"),
+            new DefaultCategory("Dining Out", "Restaurants, cafes, and takeout", "#F43F5E"),
+            new DefaultCategory("Entertainment", "Streaming, movies, events, and hobbies", "#8B5CF6"),
+            new DefaultCategory("Healthcare", "Medical visits, pharmacy, and insurance co-pays", "#EF4444"),
+            new DefaultCategory("Insurance", "Home, auto, life, and other insurance premiums", "#475569"),
+            new DefaultCategory("Savings", "Emergency fund and long-term savings", "#14B8A6"),
+            new DefaultCategory("Salary", "Primary income and payroll deposits", "#FACC15"));
 
     private final TransactionCategoryRepository transactionCategoryRepository;
     private final TransactionCategoryMapper transactionCategoryMapper;
@@ -85,6 +85,7 @@ public class TransactionCategoryService {
                 .map(defaultCategory -> TransactionCategory.builder()
                         .name(defaultCategory.name())
                         .description(defaultCategory.description())
+                        .color(defaultCategory.color())
                         .user(owner)
                         .build())
                 .toList();
@@ -92,6 +93,6 @@ public class TransactionCategoryService {
         return transactionCategoryRepository.saveAll(categories);
     }
 
-    private record DefaultCategory(String name, String description) {
+    private record DefaultCategory(String name, String description, String color) {
     }
 }

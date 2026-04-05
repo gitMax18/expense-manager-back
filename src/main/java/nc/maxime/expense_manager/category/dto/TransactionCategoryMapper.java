@@ -8,38 +8,41 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransactionCategoryMapper {
 
-    public TransactionCategory toEntity(User user, UpsertTransactionCategoryDto request) {
-        var owner = Optional.ofNullable(user)
-                .orElseThrow(() -> new IllegalArgumentException("User required to create category"));
+        public TransactionCategory toEntity(User user, UpsertTransactionCategoryDto request) {
+                var owner = Optional.ofNullable(user)
+                                .orElseThrow(() -> new IllegalArgumentException("User required to create category"));
 
-        return Optional.ofNullable(request)
-                .map(dto -> TransactionCategory.builder()
-                        .name(dto.name())
-                        .description(dto.description())
-                        .user(owner)
-                        .build())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category payload"));
-    }
+                return Optional.ofNullable(request)
+                                .map(dto -> TransactionCategory.builder()
+                                                .name(dto.name())
+                                                .description(dto.description())
+                                                .color(dto.color())
+                                                .user(owner)
+                                                .build())
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid category payload"));
+        }
 
-    public TransactionCategory updateEntity(TransactionCategory category, UpsertTransactionCategoryDto request) {
-        var payload = Optional.ofNullable(request)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category payload"));
+        public TransactionCategory updateEntity(TransactionCategory category, UpsertTransactionCategoryDto request) {
+                var payload = Optional.ofNullable(request)
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid category payload"));
 
-        return Optional.ofNullable(category)
-                .map(existing -> {
-                    existing.setName(payload.name());
-                    existing.setDescription(payload.description());
-                    return existing;
-                })
-                .orElseThrow(() -> new IllegalArgumentException("Category entity required"));
-    }
+                return Optional.ofNullable(category)
+                                .map(existing -> {
+                                        existing.setName(payload.name());
+                                        existing.setDescription(payload.description());
+                                        existing.setColor(payload.color());
+                                        return existing;
+                                })
+                                .orElseThrow(() -> new IllegalArgumentException("Category entity required"));
+        }
 
-    public TransactionCategoryDto toDto(TransactionCategory category) {
-        return new TransactionCategoryDto(
-                category.getId(),
-                category.getName(),
-                category.getDescription(),
-                category.getCreatedAt(),
-                category.getUpdatedAt());
-    }
+        public TransactionCategoryDto toDto(TransactionCategory category) {
+                return new TransactionCategoryDto(
+                                category.getId(),
+                                category.getName(),
+                                category.getDescription(),
+                                category.getColor(),
+                                category.getCreatedAt(),
+                                category.getUpdatedAt());
+        }
 }

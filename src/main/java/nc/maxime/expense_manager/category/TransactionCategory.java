@@ -33,6 +33,9 @@ public class TransactionCategory extends BaseEntity {
     @Column
     private String description;
 
+    @Column
+    private String color;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
