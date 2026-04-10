@@ -26,9 +26,10 @@ public class DashboardService {
                 .findTotalsByTypeAndCategory(owner, List.of(TransactionType.EXPENSE, TransactionType.TRANSFER_OUT))
                 .stream()
                 .map(categoryExpense -> new CategoryExpense(
-                        categoryExpense.categoryId(),
+                        categoryExpense.id(),
                         Optional.ofNullable(categoryExpense.categoryName()).orElse("Uncategorized"),
-                        Optional.ofNullable(categoryExpense.totalAmount()).orElse(BigDecimal.ZERO)))
+                        Optional.ofNullable(categoryExpense.totalAmount()).orElse(BigDecimal.ZERO),
+                        Optional.ofNullable(categoryExpense.color()).orElse("#000000")))
                 .toList();
     }
 }
